@@ -334,9 +334,13 @@ int VC0706::readPictureDMA(uint32_t n) {
                     static_cast<uint8_t>(n & 0x000000ffUL)      , 
                     CAMERADELAY >> 8, CAMERADELAY & 0xFF};
 
-  if (! runCommand(VC0706_READ_FBUF, args, sizeof(args), 5, false))
-    return -1;
+  sendCommand(VC0706_READ_FBUF, args, sizeof(args));
   
+  //wait for the signal that the picture send is done
+  uint8_t buf[10];
+  if(readResponse(10, 1000, buf) != 10)
+	  return -1;
+
   return 0;
 }
 
